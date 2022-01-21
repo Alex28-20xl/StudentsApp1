@@ -12,6 +12,8 @@ using System.Configuration;
     1. Выход - exit
     2. Вывод всех записей - selectall
     3. Очистка экрана - clear
+    4. Поиск по ФИО/Birthday - search fio/birthday [значение]
+    5. Сортировка по одному из полей таблицы - sortby [поле_таблицы] asc(по возрастающей)/desc(по убывающей)
  */
 #endregion
 
@@ -151,6 +153,55 @@ namespace StudentsApp1
                             if (sqlDataReader != null)
                             {
                                 sqlDataReader.Close();
+                            }
+
+                            break;
+                        case "search":
+
+                            if (commandArray[1].Equals("fio"))
+                            {
+                                sqlCommand = new SqlCommand(
+                                $"SELECT * FROM [Students] WHERE FIO LIKE N'%{commandArray[2]}%'", sqlConnection);
+                            }
+                            else if (commandArray[1].Equals("birthday"))
+                            {
+                                sqlCommand = new SqlCommand(
+                                $"SELECT * FROM [Students] WHERE Birthday='{commandArray[2]}'", sqlConnection);
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Аргумент {commandArray[1]} некорректен!");
+                            }
+
+                            try
+                            {
+                                sqlDataReader = sqlCommand.ExecuteReader();
+
+                                while (sqlDataReader.Read())
+                                {
+                                    Console.WriteLine($"{sqlDataReader["Id"]} {sqlDataReader["FIO"]} " +
+                                        $"{sqlDataReader["Birthday"]} {sqlDataReader["University"]} " +
+                                        $"{sqlDataReader["Group_number"]} {sqlDataReader["Course"]} " +
+                                        $"{sqlDataReader["Average_Score"]}");
+
+                                    Console.WriteLine(new String('-', 30));
+                                }
+
+                                if (sqlDataReader != null)
+                                {
+                                    sqlDataReader.Close();
+                                }
+                            }
+                            catch(Exception ex)
+                            {
+                                Console.WriteLine($"Ошибка: {ex.Message}");
+                            }
+                            finally
+                            {
+                                if (sqlDataReader != null)
+                                {
+                                    sqlDataReader.Close();
+                                }
                             }
 
                             break;
